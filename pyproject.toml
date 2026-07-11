@@ -6,6 +6,9 @@ readme = "README.md"
 requires-python = ">=3.9"
 dependencies = [
     "requests>=2.31",
+    # paramiko 4+/5 dropped the SHA-1 host key & kex the Toon's old Dropbear
+    # needs, so pin to the 3.x line for SSH access.
+    "paramiko>=3,<4",
 ]
 
 [project.scripts]
