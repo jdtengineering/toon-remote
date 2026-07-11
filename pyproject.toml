@@ -1,0 +1,19 @@
+[project]
+name = "toon"
+version = "0.1.0"
+description = "Local client for a rooted Eneco Toon thermostat"
+readme = "README.md"
+requires-python = ">=3.9"
+dependencies = [
+    "requests>=2.31",
+]
+
+[project.scripts]
+toon = "toon.cli:main"
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+include = ["toon*"]
