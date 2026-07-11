@@ -3,6 +3,12 @@
 Local client **and remote control** for a **rooted Eneco Toon** thermostat —
 talking straight to the device over your LAN. No cloud, no OAuth, no account.
 
+> [!WARNING]
+> **This code was written entirely by AI.** It has been tested against a real
+> rooted Toon and works in practice, but it may still behave in unintended ways.
+> It talks to your heating and injects input into the device — review it and use
+> it at your own risk.
+
 ![architecture](docs/architecture.svg)
 
 Read and control the thermostat and P1 smart meter over the Toon's local HTTP
