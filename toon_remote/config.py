@@ -8,8 +8,8 @@ variable > config file > built-in default.
     TOON_SSH_PASS  overrides the SSH password
 
 Config file location:
-    Windows : %APPDATA%\\toon\\config.json
-    other   : $XDG_CONFIG_HOME/toon/config.json  (default ~/.config/toon)
+    Windows : %APPDATA%\\toon-remote\\config.json
+    other   : $XDG_CONFIG_HOME/toon-remote/config.json  (default ~/.config)
 """
 
 from __future__ import annotations
@@ -28,7 +28,7 @@ def config_path() -> Path:
         base = Path(os.environ.get("APPDATA", Path.home() / "AppData" / "Roaming"))
     else:
         base = Path(os.environ.get("XDG_CONFIG_HOME", Path.home() / ".config"))
-    return base / "toon" / "config.json"
+    return base / "toon-remote" / "config.json"
 
 
 def load() -> dict:

@@ -14,9 +14,9 @@ import sys
 import time
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from toon import config
-from toon.ssh import ToonSSH
-from toon.touch import ToonTouch
+from toon_remote import config
+from toon_remote.ssh import ToonSSH
+from toon_remote.touch import ToonTouch
 
 
 def main() -> int:

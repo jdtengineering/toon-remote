@@ -1,4 +1,4 @@
-# toon
+# toon-remote
 
 Local client **and remote control** for a **rooted Eneco Toon** thermostat —
 talking straight to the device over your LAN. No cloud, no OAuth, no account.
@@ -45,8 +45,8 @@ Or grab a **self-contained binary** (no Python needed) from the
 
 Connection settings live in a per-user config file — **never in the repo**:
 
-- Windows: `%APPDATA%\toon\config.json`
-- Linux/macOS: `~/.config/toon/config.json`
+- Windows: `%APPDATA%\toon-remote\config.json`
+- Linux/macOS: `~/.config/toon-remote/config.json`
 
 Set them any of these ways:
 
@@ -77,7 +77,7 @@ realistic pressure (~380), ~10 ms samples held a few hundred ms — see
 ## Use it as a library
 
 ```python
-from toon import ToonLocal, Scene
+from toon_remote import ToonLocal, Scene
 
 toon = ToonLocal()            # host from config, or ToonLocal("192.168.1.50")
 info = toon.get_thermostat()
@@ -112,8 +112,8 @@ Host toon 192.168.1.50
   Ciphers +aes128-cbc,3des-cbc
 ```
 
-Then `ssh toon`. From Python use `toon.ssh.ToonSSH` — note **paramiko must be
-`<4`**; v4/v5 dropped the SHA-1 algorithms the Toon needs.
+Then `ssh toon`. From Python use `toon_remote.ssh.ToonSSH` — note **paramiko must
+be `<4`**; v4/v5 dropped the SHA-1 algorithms the Toon needs.
 
 ## Local HTTP API reference
 

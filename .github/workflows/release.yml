@@ -36,7 +36,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install pyinstaller pillow "paramiko<4" requests
       - name: Build binary
-        run: pyinstaller --noconfirm --clean --onefile --name toon-remote --collect-submodules paramiko toon_remote.py
+        run: pyinstaller --noconfirm --clean --onefile --name toon-remote --collect-submodules paramiko launch.py
       - name: Smoke test
         run: ./${{ matrix.bin }} --selftest
       - name: Stage artifact

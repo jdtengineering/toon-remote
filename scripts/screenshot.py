@@ -18,8 +18,8 @@ import sys
 from PIL import Image
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from toon import config
-from toon.ssh import ToonSSH
+from toon_remote import config
+from toon_remote.ssh import ToonSSH
 
 WIDTH, HEIGHT = 800, 480
 FRAME_BYTES = WIDTH * HEIGHT * 4

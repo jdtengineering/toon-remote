@@ -1,7 +1,7 @@
 [project]
-name = "toon"
-version = "0.1.0"
-description = "Local client for a rooted Eneco Toon thermostat"
+name = "toon-remote"
+version = "0.1.1"
+description = "Local client and remote control for a rooted Eneco Toon thermostat"
 readme = "README.md"
 requires-python = ">=3.9"
 dependencies = [
@@ -16,15 +16,17 @@ dependencies = [
 screenshot = ["pillow>=10"]
 gui = ["pillow>=10"]
 
+# The GUI owns the `toon-remote` command; the thermostat CLI stays `toon`
+# (two entry points can't share one name).
 [project.scripts]
-toon = "toon.cli:main"
+toon = "toon_remote.cli:main"
 
 [project.gui-scripts]
-toon-remote = "toon.app:main"
+toon-remote = "toon_remote.app:main"
 
 [build-system]
 requires = ["setuptools>=68"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools.packages.find]
-include = ["toon*"]
+include = ["toon_remote*"]
