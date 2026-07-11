@@ -13,9 +13,11 @@ from __future__ import annotations
 
 import argparse
 import os
+import sys
 
 from PIL import Image
 
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from toon.ssh import ToonSSH
 
 WIDTH, HEIGHT = 800, 480

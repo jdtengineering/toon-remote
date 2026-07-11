@@ -13,12 +13,14 @@ from __future__ import annotations
 import argparse
 import os
 import queue
+import sys
 import threading
 import time
 import tkinter as tk
 
 from PIL import Image, ImageTk
 
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from toon.ssh import ToonSSH
 from toon.touch import ToonTouch
 
