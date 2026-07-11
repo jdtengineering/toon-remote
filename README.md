@@ -72,7 +72,26 @@ tap-and-refresh experience, not video.
 Touch works by injecting events into `/dev/input/touchscreen0`, which Qt reads
 via tslib. To register, a tap must mimic the real device: `BTN_TOUCH` first,
 realistic pressure (~380), ~10 ms samples held a few hundred ms — see
-`toon/touch.py`.
+`toon_remote/touch.py`.
+
+## Performance — what to expect
+
+The Toon is a 2015-era box: a **200 MHz ARMv5 (single core), 128 MB RAM**. The
+LAN isn't the bottleneck — that little CPU is (every SSH byte is encrypted on
+it). Measured on firmware `6.3.80` over a wired LAN:
+
+| Operation | Typical | Notes |
+| --- | --- | --- |
+| HTTP API call (`toon status`, setpoint, meter) | **20–150 ms** | effectively instant |
+| Screen grab (SSH, compressed) | **~1.1 s / frame (≈0.9 fps)** | 1.5 MB frame; compression roughly halves it |
+| Screen grab (uncompressed) | ~2.6 s / frame (≈0.4 fps) | — |
+| Touch tap | ~0.4 s hold + ~0.5 s round-trip | end-to-end "tap → see result" ≈ **1–2 s** |
+
+So: **the thermostat/meter API is real-time**; the **screen mirror is
+tap-and-refresh, not video**. It's great for occasional remote control and
+debugging, not for watching animations. `ToonLocal` (HTTP) is what you want for
+anything latency-sensitive like automations; reserve SSH streaming for when you
+actually need to *see* the screen.
 
 ## Use it as a library
 
