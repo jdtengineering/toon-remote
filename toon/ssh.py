@@ -53,6 +53,21 @@ class ToonSSH:
         chan.recv_exit_status()
         return (out + err).decode("utf-8", "replace").rstrip("\n")
 
+    def read_binary(self, command: str, *, timeout: float = 60.0) -> bytes:
+        """Run a command and return its stdout as raw bytes (for binary data)."""
+        assert self._transport is not None, "call connect() first"
+        chan = self._transport.open_session(timeout=timeout)
+        chan.settimeout(timeout)
+        chan.exec_command(command)
+        chunks = []
+        while True:
+            data = chan.recv(65536)
+            if not data:
+                break
+            chunks.append(data)
+        chan.recv_exit_status()
+        return b"".join(chunks)
+
     def close(self) -> None:
         if self._transport is not None:
             self._transport.close()

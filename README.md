@@ -57,6 +57,33 @@ toon --host 192.168.1.178 resume
 `--host` defaults to the `TOON_HOST` environment variable (falling back to
 `192.168.1.178`).
 
+## Screenshot the Toon's screen
+
+The Toon renders to a raw 800×480 framebuffer. With SSH access you can grab it
+and view it on the PC:
+
+```powershell
+pip install -e ".[screenshot]"
+python scripts/screenshot.py -o toon.png
+```
+
+## SSH access
+
+The Toon runs an ancient Dropbear that only offers legacy crypto. From the shell,
+add this to `~/.ssh/config` (already done on Jim's machine as `Host toon`):
+
+```
+Host toon 192.168.1.178
+  HostName 192.168.1.178
+  User root
+  HostKeyAlgorithms +ssh-rsa
+  KexAlgorithms +diffie-hellman-group14-sha1,diffie-hellman-group1-sha1
+  Ciphers +aes128-cbc,3des-cbc
+```
+
+Then `ssh toon` (password `toon`). From Python use `toon.ssh.ToonSSH` — note
+**paramiko must be `<4`**; v4/v5 dropped the SHA-1 algorithms the Toon needs.
+
 ## Notes
 
 - `getThermostatInfo.burnerInfo`: `0` off, `1` heating, `2` hot water, `3` preheat.
