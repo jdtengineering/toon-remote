@@ -1,0 +1,62 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 920 500" font-family="-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif">
+  <rect x="1" y="1" width="918" height="498" rx="14" fill="#ffffff" stroke="#d0d7de"/>
+  <text x="32" y="44" fill="#1f2328" font-size="22" font-weight="700">How <tspan font-family="ui-monospace,Consolas,monospace">toon</tspan> talks to a rooted Eneco Toon</text>
+  <text x="32" y="66" fill="#57606a" font-size="12">Two channels over your LAN — no cloud, no account.</text>
+
+  <!-- Your PC -->
+  <rect x="32" y="92" width="300" height="368" rx="12" fill="#f6f8fa" stroke="#d0d7de"/>
+  <text x="52" y="120" fill="#1f2328" font-size="15" font-weight="700">💻 Your PC — Python</text>
+
+  <rect x="52" y="138" width="260" height="52" rx="8" fill="#eef1f4" stroke="#d0d7de"/>
+  <text x="66" y="160" fill="#1f2328" font-size="13" font-family="ui-monospace,Consolas,monospace" font-weight="700">ToonLocal</text>
+  <text x="66" y="178" fill="#57606a" font-size="12">HTTP client: thermostat, power, devices</text>
+
+  <rect x="52" y="200" width="260" height="52" rx="8" fill="#eef1f4" stroke="#d0d7de"/>
+  <text x="66" y="222" fill="#1f2328" font-size="13" font-family="ui-monospace,Consolas,monospace" font-weight="700">ToonSSH</text>
+  <text x="66" y="240" fill="#57606a" font-size="12">paramiko (&lt;4) over legacy crypto</text>
+
+  <rect x="52" y="262" width="260" height="52" rx="8" fill="#eef1f4" stroke="#d0d7de"/>
+  <text x="66" y="284" fill="#1f2328" font-size="13" font-family="ui-monospace,Consolas,monospace" font-weight="700">ToonTouch</text>
+  <text x="66" y="302" fill="#57606a" font-size="12">injects tslib touch events</text>
+
+  <rect x="52" y="324" width="260" height="52" rx="8" fill="#eef1f4" stroke="#d0d7de"/>
+  <text x="66" y="346" fill="#1f2328" font-size="13"><tspan font-family="ui-monospace,Consolas,monospace" font-weight="700">Toon Remote</tspan> — GUI</text>
+  <text x="66" y="364" fill="#57606a" font-size="12">live screen mirror + click-to-tap</text>
+
+  <text x="52" y="402" fill="#57606a" font-size="12">CLI: <tspan font-family="ui-monospace,Consolas,monospace">toon status · set-temp · scene</tspan></text>
+  <text x="52" y="424" fill="#57606a" font-size="12">Config (IP + password) is saved on disk,</text>
+  <text x="52" y="440" fill="#57606a" font-size="12">never committed to the repo.</text>
+
+  <!-- connections -->
+  <line x1="332" y1="196" x2="586" y2="196" stroke="#1f6feb" stroke-width="2.5"/>
+  <polygon points="586,196 574,190 574,202" fill="#1f6feb"/>
+  <text x="360" y="188" fill="#1f6feb" font-size="12" font-family="ui-monospace,Consolas,monospace" font-weight="700">HTTP :80</text>
+  <text x="360" y="214" fill="#57606a" font-size="12">read state &amp; control</text>
+
+  <line x1="332" y1="330" x2="586" y2="330" stroke="#8250df" stroke-width="2.5"/>
+  <polygon points="586,330 574,324 574,336" fill="#8250df"/>
+  <text x="360" y="322" fill="#8250df" font-size="12" font-family="ui-monospace,Consolas,monospace" font-weight="700">SSH :22</text>
+  <text x="360" y="348" fill="#57606a" font-size="12">screen · touch · root shell</text>
+
+  <!-- Rooted Toon -->
+  <rect x="588" y="92" width="300" height="368" rx="12" fill="#f6f8fa" stroke="#d0d7de"/>
+  <text x="608" y="120" fill="#1f2328" font-size="15" font-weight="700">🔧 Rooted Toon <tspan fill="#57606a" font-size="12" font-weight="400">· 192.168.1.x</tspan></text>
+
+  <rect x="608" y="136" width="260" height="96" rx="8" fill="#eef1f4" stroke="#d0d7de"/>
+  <text x="622" y="158" fill="#1f6feb" font-size="13" font-weight="700">HTTP JSON API</text>
+  <text x="622" y="178" fill="#57606a" font-size="12" font-family="ui-monospace,Consolas,monospace">happ_thermstat — thermostat</text>
+  <text x="622" y="196" fill="#57606a" font-size="12" font-family="ui-monospace,Consolas,monospace">happ_pwrusage — P1 meter</text>
+  <text x="622" y="214" fill="#57606a" font-size="12" font-family="ui-monospace,Consolas,monospace">hdrv_zwave — Z-Wave devices</text>
+
+  <rect x="608" y="242" width="260" height="96" rx="8" fill="#eef1f4" stroke="#d0d7de"/>
+  <text x="622" y="264" fill="#8250df" font-size="13" font-weight="700">SSH · Dropbear (legacy)</text>
+  <text x="622" y="284" fill="#57606a" font-size="12" font-family="ui-monospace,Consolas,monospace">/dev/fb0 — framebuffer 800×480</text>
+  <text x="622" y="302" fill="#57606a" font-size="12" font-family="ui-monospace,Consolas,monospace">/dev/input — touchscreen (tslib)</text>
+  <text x="622" y="320" fill="#57606a" font-size="12" font-family="ui-monospace,Consolas,monospace">root shell</text>
+
+  <rect x="608" y="348" width="260" height="96" rx="8" fill="#eef1f4" stroke="#d0d7de"/>
+  <text x="622" y="370" fill="#1f2328" font-size="13" font-weight="700">Qt UI on linuxfb</text>
+  <text x="622" y="390" fill="#57606a" font-size="12">Z-Wave radio →</text>
+  <text x="622" y="408" fill="#57606a" font-size="12">· <tspan fill="#1a7f37" font-weight="700">meter adapter</tspan> (P1 / E350)</text>
+  <text x="622" y="426" fill="#57606a" font-size="12">· boiler adapter (OpenTherm)</text>
+</svg>

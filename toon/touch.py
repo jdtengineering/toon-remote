@@ -47,11 +47,23 @@ def _ev(typ: int, code: int, val: int) -> bytes:
 class ToonTouch:
     def __init__(self, ssh: ToonSSH) -> None:
         self.ssh = ssh
+        self.cal = self._read_calibration()
+
+    def _read_calibration(self):
+        """Read this unit's tslib calibration; fall back to the known default."""
+        try:
+            parts = self.ssh.run("cat /etc/pointercal").split()
+            vals = tuple(int(p) for p in parts[:7])
+            if len(vals) == 7:
+                return vals
+        except Exception:
+            pass
+        return POINTERCAL
 
     def tap(self, px: float, py: float, *, hold: float = 0.35,
             pressure: int = 380) -> tuple[int, int]:
         """Tap the screen at pixel (px, py). Returns the raw coords used."""
-        rx, ry = pixel_to_raw(px, py)
+        rx, ry = pixel_to_raw(px, py, self.cal)
         chan = self.ssh._transport.open_session(timeout=10)
         chan.exec_command(f"cat > {TOUCH_DEV}")
         # pen down -- BTN_TOUCH first, matching the real device's frame order

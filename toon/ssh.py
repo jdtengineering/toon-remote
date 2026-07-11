@@ -5,30 +5,30 @@ offers legacy crypto, so we explicitly connect with password auth and let
 paramiko negotiate the old algorithms. Default login is root / toon.
 
     from toon.ssh import ToonSSH
-    with ToonSSH("192.168.1.178") as t:
+    with ToonSSH() as t:              # host/password come from config
         print(t.run("cat /qmf/qmf_release"))
 """
 
 from __future__ import annotations
 
-import os
-
 import paramiko
+
+from . import config
 
 
 class ToonSSH:
     def __init__(
         self,
-        host: str = os.environ.get("TOON_HOST", "192.168.1.178"),
+        host: str | None = None,
         *,
-        username: str = "root",
-        password: str = os.environ.get("TOON_SSH_PASS", "toon"),
+        username: str | None = None,
+        password: str | None = None,
         timeout: float = 15.0,
         compress: bool = False,
     ) -> None:
-        self.host = host
-        self.username = username
-        self.password = password
+        self.host = config.require_host(host)
+        self.username = config.get_username(username)
+        self.password = config.get_password(password)
         self.timeout = timeout
         self.compress = compress
         self._transport: paramiko.Transport | None = None

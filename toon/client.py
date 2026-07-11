@@ -81,15 +81,16 @@ class ToonError(RuntimeError):
 class ToonLocal:
     """Talk to a rooted Toon over its local HTTP API.
 
-    >>> toon = ToonLocal("192.168.1.178")
+    >>> toon = ToonLocal()            # host comes from config, or pass it in
     >>> toon.get_thermostat().current_temp
     22.12
     """
 
-    def __init__(self, host: str, *, timeout: float = 8.0) -> None:
-        self.host = host
+    def __init__(self, host: str | None = None, *, timeout: float = 8.0) -> None:
+        from . import config
+        self.host = config.require_host(host)
         self.timeout = timeout
-        self._base = f"http://{host}"
+        self._base = f"http://{self.host}"
         self._session = requests.Session()
 
     # -- low level -----------------------------------------------------------

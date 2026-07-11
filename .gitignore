@@ -9,6 +9,12 @@ venv/
 # Env / secrets
 .env
 config.local.*
+config.json
+
+# PyInstaller build artifacts
+build/
+dist/
+*.spec
 
 # OS
 Thumbs.db

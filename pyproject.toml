@@ -12,11 +12,15 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-# scripts/screenshot.py renders the Toon framebuffer to PNG
+# screenshots and the remote-control GUI need Pillow (Tk ships with Python)
 screenshot = ["pillow>=10"]
+gui = ["pillow>=10"]
 
 [project.scripts]
 toon = "toon.cli:main"
+
+[project.gui-scripts]
+toon-remote = "toon.app:main"
 
 [build-system]
 requires = ["setuptools>=68"]

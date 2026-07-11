@@ -1,116 +1,134 @@
 # toon
 
-Local client for a **rooted Eneco Toon** thermostat, talking directly to the
-device over its LAN HTTP API — no cloud, no OAuth.
+Local client **and remote control** for a **rooted Eneco Toon** thermostat —
+talking straight to the device over your LAN. No cloud, no OAuth, no account.
 
-My Toon lives at `192.168.1.178`.
+![architecture](docs/architecture.svg)
 
-## What a rooted Toon exposes
+Read and control the thermostat and P1 smart meter over the Toon's local HTTP
+API, and — over SSH — mirror its screen to your PC and drive the touchscreen
+remotely.
 
-A rooted Toon serves a small, **unauthenticated** JSON API on port 80. Anyone
-on the LAN can read and control it, so keep it on a trusted network. Every value
-comes back as a string; temperatures are integer centidegrees (`2250` = 22.50 °C).
+## Live screen, mirrored to the PC
 
-Endpoints discovered on this device:
+The Toon renders to a raw framebuffer; with SSH we grab it and can click to tap.
+This is a real capture from a Toon (`Stroom nu 139 Watt` = live P1 meter):
 
-| Endpoint | Purpose |
-| --- | --- |
-| `GET /happ_thermstat?action=getThermostatInfo` | current temp, setpoint, scene, burner state |
-| `GET /happ_thermstat?action=setSetpoint&Setpoint=2050` | manual hold at 20.50 °C |
-| `GET /happ_thermstat?action=changeSchemeState&state=2&temperatureState=N` | switch to a scene (N = Comfort 0 / Home 1 / Sleep 2 / Away 3) |
-| `GET /happ_thermstat?action=changeSchemeState&state=1` | resume the schedule |
-| `GET /happ_pwrusage?action=GetCurrentUsage` | live electricity / gas usage (needs a P1 meter linked) |
-| `GET /hdrv_zwave?action=getDevices.json` | Z-Wave device map (smart plugs, the `HAE_METER_v2` P1 meter, …) |
+![Toon screen](docs/screen-home.png)
+
+## Which Toons does this work on?
+
+- **Rooted Toons only.** The device must be [rooted](https://github.com/ToonSoftwareCollective/Root-A-Toon)
+  so it exposes the local HTTP API and SSH. A stock, cloud-only Toon has neither
+  (and Eneco's official cloud API is discontinued).
+- Applies to the Quby/Eneco **Toon 1 and Toon 2** display (the `qb2` software line).
+- The **HTTP JSON API** is present on every rooted Toon firmware.
+- The **screen + touch** tooling assumes the standard Toon hardware: an
+  **800×480, 32bpp** framebuffer and a **TSC2007** touchscreen read through
+  **tslib**. The touch calibration is read live from the device's
+  `/etc/pointercal`, so it adapts per unit.
+- Developed and tested against firmware **`base-qb2-uni 6.3.80`**, kernel
+  `2.6.36` (ARM926). Other rooted firmwares should work.
 
 ## Install
 
 ```powershell
 python -m venv .venv
 .venv\Scripts\Activate.ps1
-pip install -e .
+pip install -e ".[gui]"      # Pillow for screenshots/GUI (Tk ships with Python)
 ```
+
+Or grab a **self-contained binary** (no Python needed) from the
+[Releases](../../releases) page — `toon-remote` for Windows and Linux.
+
+## Configure (IP + password)
+
+Connection settings live in a per-user config file — **never in the repo**:
+
+- Windows: `%APPDATA%\toon\config.json`
+- Linux/macOS: `~/.config/toon/config.json`
+
+Set them any of these ways:
+
+- **GUI:** launch `toon-remote` and use the **Config…** button (first run asks
+  automatically).
+- **Env vars:** `TOON_HOST` and `TOON_SSH_PASS`.
+- **CLI flag:** `--host`.
+
+The default SSH login on a rooted Toon is `root` / `toon`.
+
+## Remote control (view + touch)
+
+```powershell
+python scripts/remote.py                          # or the toon-remote binary
+python scripts/tap.py 620 235 --shot after.png    # scripted single tap
+python scripts/screenshot.py -o toon.png          # just grab the screen
+```
+
+Click anywhere in the window to tap that spot on the Toon. Streaming is ~1 fps
+(the Toon's 200 MHz CPU encrypting a 1.5 MB frame is the ceiling), so it's a
+tap-and-refresh experience, not video.
+
+Touch works by injecting events into `/dev/input/touchscreen0`, which Qt reads
+via tslib. To register, a tap must mimic the real device: `BTN_TOUCH` first,
+realistic pressure (~380), ~10 ms samples held a few hundred ms — see
+`toon/touch.py`.
 
 ## Use it as a library
 
 ```python
 from toon import ToonLocal, Scene
 
-toon = ToonLocal("192.168.1.178")
-
+toon = ToonLocal()            # host from config, or ToonLocal("192.168.1.50")
 info = toon.get_thermostat()
 print(info.current_temp, info.setpoint, info.active_scene)
 
-toon.set_setpoint(20.5)     # manual hold
-toon.set_scene(Scene.HOME)  # switch preset
-toon.resume_program()       # back to the schedule
+toon.set_setpoint(20.5)       # manual hold
+toon.set_scene(Scene.HOME)    # switch preset
+toon.resume_program()         # back to the schedule
 ```
 
-## Use it from the shell
+## Command line
 
 ```powershell
-toon --host 192.168.1.178 status
-toon --host 192.168.1.178 set-temp 20.5
-toon --host 192.168.1.178 scene home
-toon --host 192.168.1.178 resume
+toon status         # thermostat + live power
+toon set-temp 20.5
+toon scene home
+toon resume
+toon devices        # raw Z-Wave device map
 ```
-
-`--host` defaults to the `TOON_HOST` environment variable (falling back to
-`192.168.1.178`).
-
-## Screenshot the Toon's screen
-
-The Toon renders to a raw 800×480 framebuffer. With SSH access you can grab it
-and view it on the PC:
-
-```powershell
-pip install -e ".[screenshot]"
-python scripts/screenshot.py -o toon.png
-```
-
-## Remote control (view + touch)
-
-Full remote control over SSH — mirror the screen and click to tap:
-
-```powershell
-pip install -e ".[screenshot]"
-python scripts/remote.py            # live window, click anywhere to tap
-python scripts/tap.py 620 235 --shot after.png   # scripted single tap
-```
-
-Streaming is ~1 fps (the Toon's 200 MHz CPU encrypting a 1.5 MB frame is the
-limit), so it's a "tap-and-refresh" experience, not video.
-
-Touch works by injecting events into `/dev/input/touchscreen0`, which Qt reads
-via tslib. To register, a tap must mimic the real device: `BTN_TOUCH` first,
-realistic pressure (~380), ~10 ms samples held a few hundred ms — see
-`toon/touch.py`. Coordinates are mapped through the inverse of the
-`/etc/pointercal` tslib calibration.
 
 ## SSH access
 
-The Toon runs an ancient Dropbear that only offers legacy crypto. From the shell,
-add this to `~/.ssh/config` (already done on Jim's machine as `Host toon`):
+The Toon runs an ancient Dropbear offering only legacy crypto. From a shell, add
+this to `~/.ssh/config`:
 
 ```
-Host toon 192.168.1.178
-  HostName 192.168.1.178
+Host toon 192.168.1.50
+  HostName 192.168.1.50
   User root
   HostKeyAlgorithms +ssh-rsa
   KexAlgorithms +diffie-hellman-group14-sha1,diffie-hellman-group1-sha1
   Ciphers +aes128-cbc,3des-cbc
 ```
 
-Then `ssh toon` (password `toon`). From Python use `toon.ssh.ToonSSH` — note
-**paramiko must be `<4`**; v4/v5 dropped the SHA-1 algorithms the Toon needs.
+Then `ssh toon`. From Python use `toon.ssh.ToonSSH` — note **paramiko must be
+`<4`**; v4/v5 dropped the SHA-1 algorithms the Toon needs.
 
-## Notes
+## Local HTTP API reference
 
-- `getThermostatInfo.burnerInfo`: `0` off, `1` heating, `2` hot water, `3` preheat.
-- `programState`: `0` off, `1` following the schedule, `2` temporary override.
-- The P1 usage fields read `null` until a smart meter is linked and reporting.
+| Endpoint | Purpose |
+| --- | --- |
+| `GET /happ_thermstat?action=getThermostatInfo` | temp, setpoint, scene, burner state |
+| `GET /happ_thermstat?action=setSetpoint&Setpoint=2050` | manual hold at 20.50 °C |
+| `GET /happ_thermstat?action=changeSchemeState&state=2&temperatureState=N` | scene (Comfort 0 / Home 1 / Sleep 2 / Away 3) |
+| `GET /happ_pwrusage?action=GetCurrentUsage` | live electricity / gas usage |
+| `GET /hdrv_zwave?action=getDevices.json` | Z-Wave device map (P1 meter, plugs, …) |
+
+Temperatures on the wire are integer centidegrees (`2250` = 22.50 °C). The local
+API is **unauthenticated** — keep the Toon on a trusted LAN.
 
 ## Roadmap
 
-- [ ] Poll history endpoints (`happ_pwrusage` graph data) for logging.
-- [ ] Read Z-Wave smart-plug state and toggle plugs.
+- [ ] Poll history endpoints for logging.
 - [ ] Home Assistant / MQTT bridge.

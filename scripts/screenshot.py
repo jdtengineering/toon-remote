@@ -4,7 +4,7 @@ The Toon renders to a raw 800x480 32bpp framebuffer (fb0 = background UI,
 fb1 = foreground overlay). It has no base64/gzip, so we stream the raw bytes
 straight through the SSH channel and decode them with Pillow here.
 
-    python scripts/screenshot.py [--host 192.168.1.178] [-o toon.png] [--fb fb0]
+    python scripts/screenshot.py [--host 192.168.1.50] [-o toon.png] [--fb fb0]
 
 Requires Pillow (pip install pillow).
 """
@@ -18,6 +18,7 @@ import sys
 from PIL import Image
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from toon import config
 from toon.ssh import ToonSSH
 
 WIDTH, HEIGHT = 800, 480
@@ -34,7 +35,7 @@ def grab(ssh: ToonSSH, fb: str = "fb0") -> Image.Image:
 
 def main(argv: list[str] | None = None) -> int:
     p = argparse.ArgumentParser(description=__doc__)
-    p.add_argument("--host", default=os.environ.get("TOON_HOST", "192.168.1.178"))
+    p.add_argument("--host", default=config.get_host())
     p.add_argument("-o", "--out", default="toon.png", help="output PNG path")
     p.add_argument("--fb", default="fb0", choices=["fb0", "fb1"],
                    help="framebuffer layer (fb0 = UI, fb1 = overlay)")

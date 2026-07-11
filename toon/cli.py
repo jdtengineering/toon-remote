@@ -1,26 +1,25 @@
 """Tiny CLI for the local Toon client.
 
-Examples:
-    toon --host 192.168.1.178 status
-    toon --host 192.168.1.178 set-temp 20.5
-    toon --host 192.168.1.178 scene home
-    toon --host 192.168.1.178 resume
+Examples (host defaults to config / TOON_HOST if --host is omitted):
+    toon --host 192.168.1.50 status
+    toon set-temp 20.5
+    toon scene home
+    toon resume
 """
 
 from __future__ import annotations
 
 import argparse
 import json
-import os
 
+from . import config
 from .client import Scene, ToonLocal
-
-DEFAULT_HOST = os.environ.get("TOON_HOST", "192.168.1.178")
 
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(prog="toon", description=__doc__)
-    parser.add_argument("--host", default=DEFAULT_HOST, help="Toon IP address")
+    parser.add_argument("--host", default=config.get_host(),
+                        help="Toon IP address (default: config / TOON_HOST)")
     sub = parser.add_subparsers(dest="cmd", required=True)
 
     sub.add_parser("status", help="show thermostat + power usage")
