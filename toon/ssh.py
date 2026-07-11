@@ -24,11 +24,13 @@ class ToonSSH:
         username: str = "root",
         password: str = os.environ.get("TOON_SSH_PASS", "toon"),
         timeout: float = 15.0,
+        compress: bool = False,
     ) -> None:
         self.host = host
         self.username = username
         self.password = password
         self.timeout = timeout
+        self.compress = compress
         self._transport: paramiko.Transport | None = None
 
     def connect(self) -> "ToonSSH":
@@ -38,6 +40,8 @@ class ToonSSH:
         opts = transport.get_security_options()
         opts.key_types = tuple(dict.fromkeys(("ssh-rsa",) + tuple(opts.key_types)))
         transport.banner_timeout = self.timeout
+        if self.compress:
+            transport.use_compression(True)  # zlib crushes the mostly-black fb
         transport.connect(username=self.username, password=self.password)
         self._transport = transport
         return self
@@ -67,6 +71,16 @@ class ToonSSH:
             chunks.append(data)
         chan.recv_exit_status()
         return b"".join(chunks)
+
+    def write_stdin(self, command: str, data: bytes, *, timeout: float = 15.0) -> None:
+        """Run a command and feed `data` to its stdin (e.g. cat > /dev/...)."""
+        assert self._transport is not None, "call connect() first"
+        chan = self._transport.open_session(timeout=timeout)
+        chan.settimeout(timeout)
+        chan.exec_command(command)
+        chan.sendall(data)
+        chan.shutdown_write()
+        chan.recv_exit_status()
 
     def close(self) -> None:
         if self._transport is not None:

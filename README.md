@@ -67,6 +67,25 @@ pip install -e ".[screenshot]"
 python scripts/screenshot.py -o toon.png
 ```
 
+## Remote control (view + touch)
+
+Full remote control over SSH — mirror the screen and click to tap:
+
+```powershell
+pip install -e ".[screenshot]"
+python scripts/remote.py            # live window, click anywhere to tap
+python scripts/tap.py 620 235 --shot after.png   # scripted single tap
+```
+
+Streaming is ~1 fps (the Toon's 200 MHz CPU encrypting a 1.5 MB frame is the
+limit), so it's a "tap-and-refresh" experience, not video.
+
+Touch works by injecting events into `/dev/input/touchscreen0`, which Qt reads
+via tslib. To register, a tap must mimic the real device: `BTN_TOUCH` first,
+realistic pressure (~380), ~10 ms samples held a few hundred ms — see
+`toon/touch.py`. Coordinates are mapped through the inverse of the
+`/etc/pointercal` tslib calibration.
+
 ## SSH access
 
 The Toon runs an ancient Dropbear that only offers legacy crypto. From the shell,
